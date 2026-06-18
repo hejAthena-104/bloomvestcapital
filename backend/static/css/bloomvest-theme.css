@@ -28,10 +28,13 @@
   --bs-btn-hover-bg:#f27457; --bs-btn-hover-border-color:#f27457; --bs-btn-hover-color:#fff;
   --bs-btn-active-bg:#f27457; --bs-btn-active-border-color:#f27457; --bs-btn-active-color:#fff;
 }
-.bg-primary       { background-color:#f27457 !important; }
-.text-primary     { color:#f27457 !important; }
+/* opacity-aware so bg-opacity-10 / text-opacity tints still work
+   (a hardcoded colour here would turn .bg-primary.bg-opacity-10 squares solid
+    and hide the same-coloured icon inside them) */
+.bg-primary       { background-color:rgba(var(--bs-primary-rgb), var(--bs-bg-opacity,1)) !important; }
+.text-primary     { color:rgba(var(--bs-primary-rgb), var(--bs-text-opacity,1)) !important; }
 .link-primary     { color:#f27457 !important; }
-.badge.bg-primary { background-color:#f27457 !important; }
+.badge.bg-primary { --bs-bg-opacity:1; background-color:#f27457 !important; }
 .progress-bar     { background-color:#f27457; }
 .btn-link         { color:#03a6a6; }
 
