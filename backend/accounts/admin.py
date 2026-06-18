@@ -1,6 +1,14 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, EmailVerificationToken, PasswordResetToken, LoginHistory, Notification
+from django.contrib.auth.models import Group
+from .models import User, LoginHistory, Notification
+
+# Remove the default Django "Groups" model from the admin — this platform does not
+# use group-based permissions, so it is just clutter.
+try:
+    admin.site.unregister(Group)
+except admin.sites.NotRegistered:
+    pass
 
 
 @admin.register(User)
@@ -106,24 +114,9 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('-created_at',)
 
 
-@admin.register(EmailVerificationToken)
-class EmailVerificationTokenAdmin(admin.ModelAdmin):
-    """Admin interface for Email Verification Tokens"""
-    list_display = ('user', 'token', 'created_at', 'expires_at', 'is_used')
-    list_filter = ('is_used', 'created_at', 'expires_at')
-    search_fields = ('user__username', 'user__email', 'token')
-    readonly_fields = ('token', 'created_at', 'expires_at')
-    ordering = ('-created_at',)
-
-
-@admin.register(PasswordResetToken)
-class PasswordResetTokenAdmin(admin.ModelAdmin):
-    """Admin interface for Password Reset Tokens"""
-    list_display = ('user', 'token', 'created_at', 'expires_at', 'is_used')
-    list_filter = ('is_used', 'created_at', 'expires_at')
-    search_fields = ('user__username', 'user__email', 'token')
-    readonly_fields = ('token', 'created_at', 'expires_at')
-    ordering = ('-created_at',)
+# EmailVerificationToken and PasswordResetToken are transient internal plumbing
+# (auto-created and consumed during signup / password reset). They are intentionally
+# NOT registered in the admin to keep it focused on platform management.
 
 
 @admin.register(LoginHistory)
