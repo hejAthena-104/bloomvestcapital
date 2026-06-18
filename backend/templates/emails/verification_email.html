@@ -1,0 +1,37 @@
+{% extends 'emails/base_email.html' %}
+
+{% block content %}
+<h2>Hi {{ first_name }},</h2>
+
+<p>Welcome to {{ site_name }}! We're excited to have you on board.</p>
+
+<p>To complete your registration and start your investment journey, please verify your email address by clicking the button below:</p>
+
+<div style="text-align: center;">
+    <a href="{{ verification_link }}" class="btn">Verify Email Address</a>
+</div>
+
+<div class="info-box">
+    <p><strong>⏰ This link will expire in 24 hours</strong></p>
+    <p style="margin-top: 10px;">If you didn't create an account with {{ site_name }}, please ignore this email.</p>
+</div>
+
+<p>Alternatively, you can copy and paste this link into your browser:</p>
+<p style="word-break: break-all; color: #667eea; font-size: 14px;">{{ verification_link }}</p>
+
+<div class="divider"></div>
+
+<p style="font-size: 14px; color: #718096;">
+    Once verified, you'll have access to:
+</p>
+<ul style="color: #4a5568; margin-left: 20px; margin-bottom: 20px;">
+    <li>Multiple investment plans</li>
+    <li>Real-time portfolio tracking</li>
+    <li>Secure deposits and withdrawals</li>
+    <li>24/7 customer support</li>
+</ul>
+
+<p>If you have any questions, feel free to reach out to our support team.</p>
+
+<p>Best regards,<br>The {{ site_name }} Team</p>
+{% endblock %}

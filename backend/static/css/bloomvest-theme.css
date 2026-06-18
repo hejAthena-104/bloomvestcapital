@@ -1,0 +1,93 @@
+/* ============================================================
+   Bloomvest Capital brand override
+   Loaded AFTER the Dashly theme bundle.
+   Brand feel (matches the marketing site):
+     - light, airy background (#f2fafa)
+     - CORAL (#f27457) = energetic call-to-action colour
+     - TEAL (#03a6a6 / dark #0d5152) = trust / text / secondary accent
+   ============================================================ */
+
+:root, [data-theme="light"], [data-theme="dark"] {
+  --bs-primary: #f27457;            /* coral drives Bootstrap "primary" */
+  --bs-primary-rgb: 242,116,87;
+  --bs-link-color: #03a6a6;         /* teal links */
+  --bs-link-hover-color: #0d5152;
+  --bs-body-bg: #f2fafa;
+}
+
+/* ---------- Coral primary buttons / CTAs ---------- */
+.btn-primary {
+  --bs-btn-bg:#f27457; --bs-btn-border-color:#f27457;
+  --bs-btn-hover-bg:#e25c3d; --bs-btn-hover-border-color:#e25c3d;
+  --bs-btn-active-bg:#d94e2f; --bs-btn-active-border-color:#d94e2f;
+  --bs-btn-color:#fff; --bs-btn-hover-color:#fff; --bs-btn-active-color:#fff;
+  --bs-btn-disabled-bg:#f27457; --bs-btn-disabled-border-color:#f27457;
+}
+.btn-outline-primary {
+  --bs-btn-color:#f27457; --bs-btn-border-color:#f27457;
+  --bs-btn-hover-bg:#f27457; --bs-btn-hover-border-color:#f27457; --bs-btn-hover-color:#fff;
+  --bs-btn-active-bg:#f27457; --bs-btn-active-border-color:#f27457; --bs-btn-active-color:#fff;
+}
+.bg-primary       { background-color:#f27457 !important; }
+.text-primary     { color:#f27457 !important; }
+.link-primary     { color:#f27457 !important; }
+.badge.bg-primary { background-color:#f27457 !important; }
+.progress-bar     { background-color:#f27457; }
+.btn-link         { color:#03a6a6; }
+
+/* ---------- Brand accent helpers ---------- */
+.text-teal  { color:#03a6a6 !important; }
+.bg-teal    { background-color:#03a6a6 !important; }
+.text-coral { color:#f27457 !important; }
+.bg-coral   { background-color:#f27457 !important; }
+a:not(.btn):not(.nav-link):not(.navbar-brand) { color:#03a6a6; }
+a:not(.btn):not(.nav-link):not(.navbar-brand):hover { color:#0d5152; }
+
+/* ---------- Clean, light, airy sidebar (matches marketing) ---------- */
+#mainNavbar.bg-white,
+.navbar-vertical.bg-white {
+  background-color:#ffffff !important;
+  border-right:1px solid #e6efef;
+  box-shadow:0 0 24px rgba(13,81,82,0.04);
+}
+/* default nav links: dark-teal text, teal icons */
+#mainNavbar .navbar-nav .nav-link {
+  color:#0d5152 !important;
+  border-radius:10px;
+  margin:2px 8px;
+  transition:background-color .15s ease,color .15s ease;
+}
+#mainNavbar .navbar-nav .nav-link i,
+#mainNavbar .navbar-nav .nav-link .fe {
+  color:#03a6a6 !important;
+}
+#mainNavbar .navbar-nav .nav-link:hover {
+  background-color:#f2fafa !important;
+  color:#0d5152 !important;
+}
+/* active item -> soft coral pill with coral text/icon */
+#mainNavbar .navbar-nav .nav-link.active,
+.navbar-vertical .navbar-nav .nav-link.active {
+  background-color:rgba(242,116,87,0.12) !important;
+  color:#f27457 !important;
+  font-weight:600;
+}
+#mainNavbar .navbar-nav .nav-link.active i,
+#mainNavbar .navbar-nav .nav-link.active .fe,
+#mainNavbar .navbar-nav .nav-link.active svg {
+  color:#f27457 !important;
+}
+/* section headings inside sidebar */
+#mainNavbar .navbar-heading { color:#8aa3a3 !important; }
+
+/* ---------- Logo: never squeeze (preserve aspect ratio) ---------- */
+#mainNavbar .navbar-brand-img,
+.navbar-brand .navbar-brand-img {
+  height:36px !important;
+  width:auto !important;
+  max-width:none !important;
+  object-fit:contain !important;
+}
+
+/* ---------- Body ---------- */
+body { background-color:#f2fafa; }

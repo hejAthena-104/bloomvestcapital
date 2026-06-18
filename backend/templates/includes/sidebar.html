@@ -1,0 +1,118 @@
+<!-- NAVIGATION SIDEBAR -->
+<nav id="mainNavbar" class="navbar navbar-vertical navbar-expand-lg scrollbar bg-white navbar-light">
+    <!-- Theme configuration (navbar) -->
+    <script>
+        let navigationColor = localStorage.getItem('navigationColor'),
+            navbar = document.getElementById('mainNavbar');
+
+        if (navigationColor != null && navbar != null) {
+            if (navigationColor == 'inverted') {
+                navbar.classList.add('bg-dark', 'navbar-dark');
+                navbar.classList.remove('bg-white', 'navbar-light');
+            } else {
+                navbar.classList.add('bg-white', 'navbar-light');
+                navbar.classList.remove('bg-dark', 'navbar-dark');
+            }
+        }
+    </script>
+    <div class="container-fluid">
+        <!-- Brand -->
+        <a class="navbar-brand" href="{% url 'dashboard:index' %}">
+            {% load static %}
+            <img src="{% static 'images/logo.png' %}"
+                class="navbar-brand-img logo-light logo-small" alt="Bloomvest Capital" style="width: auto; height: 40px;">
+            <img src="{% static 'images/logo.png' %}"
+                class="navbar-brand-img logo-light logo-large" alt="Bloomvest Capital" style="width: auto; height: 50px; max-width: 200px;">
+            <img src="{% static 'images/logo-dark.png' %}"
+                class="navbar-brand-img logo-dark logo-small" alt="Bloomvest Capital" style="width: auto; height: 40px;">
+            <img src="{% static 'images/logo-dark.png' %}"
+                class="navbar-brand-img logo-dark logo-large" alt="Bloomvest Capital" style="width: auto; height: 50px; max-width: 200px;">
+        </a>
+
+        <!-- Navbar toggler -->
+        <a href="javascript: void(0);" class="navbar-toggler" data-bs-toggle="collapse"
+            data-bs-target="#sidenavCollapse" aria-controls="sidenavCollapse" aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </a>
+
+        <!-- Collapse -->
+        <div class="collapse navbar-collapse" id="sidenavCollapse">
+            <!-- Navigation -->
+            <ul class="navbar-nav mb-lg-7">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}"
+                       href="{% url 'dashboard:index' %}">
+                        <i class="bi bi-house nav-link-icon fs-3"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'deposits' %}active{% endif %}"
+                       href="{% url 'dashboard:deposits' %}">
+                        <i class="bi bi-wallet-fill nav-link-icon fs-3"></i>
+                        <span>Deposit</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'withdrawals' %}active{% endif %}"
+                       href="{% url 'dashboard:withdrawals' %}">
+                        <i class="bi bi-graph-down nav-link-icon fs-3"></i>
+                        <span>Withdraw</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'account_history' %}active{% endif %}"
+                       href="{% url 'dashboard:account_history' %}">
+                        <i class="bi bi-clock-history nav-link-icon fs-3"></i>
+                        <span>Transaction History</span>
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link {% if request.resolver_match.url_name in 'buy_plan,my_plans' %}active{% endif %}"
+                       href="#pagesCollapse" data-bs-toggle="collapse"
+                        role="button" aria-expanded="false" aria-controls="pagesCollapse">
+                        <i class="bi bi-bounding-box nav-link-icon fs-3"></i>
+                        <span>Investment</span>
+                    </a>
+                    <div class="collapse" id="pagesCollapse">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a href="{% url 'dashboard:buy_plan' %}"
+                                   class="nav-link {% if request.resolver_match.url_name == 'buy_plan' %}active{% endif %}">
+                                    <span>Invest</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'dashboard:my_plans' %}"
+                                   class="nav-link {% if request.resolver_match.url_name == 'my_plans' %}active{% endif %}">
+                                    <span>My investments</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'refer_user' %}active{% endif %}"
+                       href="{% url 'dashboard:refer_user' %}">
+                        <i class="bi bi-sign-intersection-y nav-link-icon fs-3"></i>
+                        <span>Referral</span>
+                    </a>
+                </li>
+
+                <li class="nav-item w-100">
+                    <hr>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'dashboard:support' %}"
+                       class="nav-link {% if request.resolver_match.url_name == 'support' %}active{% endif %}">
+                        <i class="bi bi-info-circle-fill nav-link-icon fs-3"></i>
+                        <span>Help & Support</span>
+                    </a>
+                </li>
+            </ul>
+            <!-- End of Navigation -->
+        </div>
+        <!-- End of Collapse -->
+    </div>
+</nav>

@@ -1,0 +1,20 @@
+[build]
+  publish = "."
+
+[[redirects]]
+  from = "/login"
+  to = "https://dashboard.bloomvestcapital.com/auth/login/"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/register"
+  to = "https://dashboard.bloomvestcapital.com/auth/register/"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/dashboard/*"
+  to = "https://dashboard.bloomvestcapital.com/dashboard/:splat"
+  status = 302
+  force = true
