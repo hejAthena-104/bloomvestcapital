@@ -15,3 +15,6 @@ backend/staticfiles/
 # OS / editor
 .DS_Store
 Thumbs.db
+
+# Test / tooling artifacts
+**/.playwright-mcp/
