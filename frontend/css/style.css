@@ -5960,7 +5960,7 @@ Go Top CSS
 /*=================================
 Buy Now Btn
 ====================================*/
-.buy-now-btn {
+/* .buy-now-btn {
   right: 30px;
   z-index: 99;
   top: 50%;
@@ -5981,7 +5981,7 @@ Buy Now Btn
 .buy-now-btn:hover {
   background-color: #f2132b;
   color: #ffffff !important;
-}
+} */
 
 @keyframes tada {
   0% {

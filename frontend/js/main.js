@@ -263,7 +263,7 @@ jQuery(function ($) {
 	});
 
 	// Buy Now Btn
-	$('body').append("<a href='https://themeforest.net/checkout/from_item/28881346?license=regular&support=bundle_6month&_ga=2.12192755.634514020.1646539215-1425290503.1590986634' target='_blank' class='buy-now-btn'>Buy Now</a>");
+	// $('body').append("<a href='https://themeforest.net/checkout/from_item/28881346?license=regular&support=bundle_6month&_ga=2.12192755.634514020.1646539215-1425290503.1590986634' target='_blank' class='buy-now-btn'>Buy Now</a>");
 
 	// Switch Btn
 	$('body').append("<div class='switch-box'><label id='switch' class='switch'><input type='checkbox' onchange='toggleTheme()' id='slider'><span class='slider round'></span></label></div>");
