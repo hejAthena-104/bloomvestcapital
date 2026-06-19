@@ -6,9 +6,9 @@
 {% block extra_head %}
 <style>
     :root {
-        --tc-primary: #03a6a6;
-        --tc-primary-dark: #0d5152;
-        --tc-primary-darker: #0a3d3d;
+        --tc-primary: #f2132b;
+        --tc-primary-dark: #c70f22;
+        --tc-primary-darker: #a30d1d;
     }
     .auth-wrapper {
         min-height: 100vh;
@@ -90,7 +90,7 @@
         border: 1px solid rgba(255,255,255,0.3);
         border-radius: 20px;
         padding: 2rem;
-        box-shadow: 0 8px 32px rgba(3, 166, 166, 0.08);
+        box-shadow: 0 8px 32px rgba(242, 19, 43, 0.08);
     }
     [data-theme="dark"] .glass-card {
         background: rgba(30,30,40,0.7);
@@ -101,7 +101,7 @@
         background: rgba(255,255,255,0.5);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(3, 166, 166, 0.08);
+        border: 1px solid rgba(242, 19, 43, 0.08);
         border-radius: 16px;
         margin-bottom: 1.25rem;
         overflow: hidden;
@@ -111,8 +111,8 @@
         border: 1px solid rgba(255,255,255,0.08);
     }
     .section-card .card-header {
-        background: linear-gradient(135deg, rgba(3, 166, 166, 0.05) 0%, transparent 100%);
-        border-bottom: 1px solid rgba(3, 166, 166, 0.08);
+        background: linear-gradient(135deg, rgba(242, 19, 43, 0.05) 0%, transparent 100%);
+        border-bottom: 1px solid rgba(242, 19, 43, 0.08);
         padding: 0.875rem 1.25rem;
     }
     [data-theme="dark"] .section-card .card-header {
@@ -140,7 +140,7 @@
         left: 50%;
         width: 100%;
         height: 3px;
-        background: linear-gradient(90deg, var(--tc-primary) 0%, rgba(3, 166, 166, 0.2) 100%);
+        background: linear-gradient(90deg, var(--tc-primary) 0%, rgba(242, 19, 43, 0.2) 100%);
         border-radius: 2px;
     }
     .step:last-child::after {
@@ -150,7 +150,7 @@
         width: 34px;
         height: 34px;
         border-radius: 50%;
-        background: rgba(3, 166, 166, 0.1);
+        background: rgba(242, 19, 43, 0.1);
         color: var(--tc-primary);
         display: inline-flex;
         align-items: center;
@@ -162,9 +162,9 @@
         transition: all 0.3s ease;
     }
     .step.active .step-circle {
-        background: linear-gradient(135deg, #f27457 0%, #e25c3d 100%);
+        background: linear-gradient(135deg, #f2132b 0%, #c70f22 100%);
         color: #fff;
-        box-shadow: 0 4px 15px rgba(3, 166, 166, 0.3);
+        box-shadow: 0 4px 15px rgba(242, 19, 43, 0.3);
     }
     .step-label {
         display: block;
@@ -176,7 +176,7 @@
     .form-control {
         border-radius: 10px;
         padding: 0.75rem 1rem;
-        border: 1px solid rgba(3, 166, 166, 0.15);
+        border: 1px solid rgba(242, 19, 43, 0.15);
         transition: all 0.3s ease;
         background: rgba(255,255,255,0.8);
     }
@@ -185,17 +185,17 @@
     }
     .form-control:focus {
         border-color: var(--tc-primary);
-        box-shadow: 0 0 0 4px rgba(3, 166, 166, 0.1);
+        box-shadow: 0 0 0 4px rgba(242, 19, 43, 0.1);
     }
     .input-group-text {
         border-radius: 10px;
-        background: rgba(3, 166, 166, 0.05);
-        border: 1px solid rgba(3, 166, 166, 0.15);
+        background: rgba(242, 19, 43, 0.05);
+        border: 1px solid rgba(242, 19, 43, 0.15);
         color: var(--tc-primary);
     }
     .password-strength {
         height: 4px;
-        background: rgba(3, 166, 166, 0.1);
+        background: rgba(242, 19, 43, 0.1);
         border-radius: 2px;
         margin-top: 0.5rem;
         overflow: hidden;
@@ -239,18 +239,18 @@
         justify-content: center;
     }
     .btn-primary {
-        background: linear-gradient(135deg, #f27457 0%, #e25c3d 100%);
+        background: linear-gradient(135deg, #f2132b 0%, #c70f22 100%);
         border: none;
         border-radius: 12px;
         padding: 1rem;
         font-weight: 600;
         letter-spacing: 0.3px;
-        box-shadow: 0 4px 15px rgba(3, 166, 166, 0.3);
+        box-shadow: 0 4px 15px rgba(242, 19, 43, 0.3);
         transition: all 0.3s ease;
     }
     .btn-primary:hover {
-        background: linear-gradient(135deg, #e25c3d 0%, #d94e2f 100%);
-        box-shadow: 0 6px 20px rgba(3, 166, 166, 0.4);
+        background: linear-gradient(135deg, #c70f22 0%, #a30d1d 100%);
+        box-shadow: 0 6px 20px rgba(242, 19, 43, 0.4);
         transform: translateY(-1px);
     }
     .text-primary {
@@ -567,9 +567,9 @@
         } else if (strength <= 50) {
             bar.style.background = '#fd7e14';
         } else if (strength <= 75) {
-            bar.style.background = '#0d5152';
+            bar.style.background = '#c70f22';
         } else {
-            bar.style.background = '#03a6a6';
+            bar.style.background = '#f2132b';
         }
     });
 </script>

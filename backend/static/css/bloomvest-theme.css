@@ -1,89 +1,83 @@
 /* ============================================================
-   Bloomvest Capital brand override
-   Loaded AFTER the Dashly theme bundle.
-   Brand feel (matches the marketing site):
-     - light, airy background (#f2fafa)
-     - CORAL (#f27457) = energetic call-to-action colour
-     - TEAL (#03a6a6 / dark #0d5152) = trust / text / secondary accent
+   Bloomvest Capital brand override — loaded AFTER the Dashly bundle.
+   Brand (matches the new EnvyTheme marketing site):
+     - RED #f2132b   = primary action colour
+     - NAVY #09101f  = headings / text / sidebar default
+     - light, clean background
    ============================================================ */
 
 :root, [data-theme="light"], [data-theme="dark"] {
-  --bs-primary: #f27457;            /* coral drives Bootstrap "primary" */
-  --bs-primary-rgb: 242,116,87;
-  --bs-link-color: #03a6a6;         /* teal links */
-  --bs-link-hover-color: #0d5152;
-  --bs-body-bg: #f2fafa;
+  --bs-primary: #f2132b;
+  --bs-primary-rgb: 242,19,43;
+  --bs-link-color: #f2132b;
+  --bs-link-hover-color: #c70f22;
+  --bs-body-bg: #f7f8fa;
 }
 
-/* ---------- Coral primary buttons / CTAs ---------- */
+/* ---------- Red primary buttons / CTAs ---------- */
 .btn-primary {
-  --bs-btn-bg:#f27457; --bs-btn-border-color:#f27457;
-  --bs-btn-hover-bg:#e25c3d; --bs-btn-hover-border-color:#e25c3d;
-  --bs-btn-active-bg:#d94e2f; --bs-btn-active-border-color:#d94e2f;
+  --bs-btn-bg:#f2132b; --bs-btn-border-color:#f2132b;
+  --bs-btn-hover-bg:#c70f22; --bs-btn-hover-border-color:#c70f22;
+  --bs-btn-active-bg:#a30d1d; --bs-btn-active-border-color:#a30d1d;
   --bs-btn-color:#fff; --bs-btn-hover-color:#fff; --bs-btn-active-color:#fff;
-  --bs-btn-disabled-bg:#f27457; --bs-btn-disabled-border-color:#f27457;
+  --bs-btn-disabled-bg:#f2132b; --bs-btn-disabled-border-color:#f2132b;
 }
 .btn-outline-primary {
-  --bs-btn-color:#f27457; --bs-btn-border-color:#f27457;
-  --bs-btn-hover-bg:#f27457; --bs-btn-hover-border-color:#f27457; --bs-btn-hover-color:#fff;
-  --bs-btn-active-bg:#f27457; --bs-btn-active-border-color:#f27457; --bs-btn-active-color:#fff;
+  --bs-btn-color:#f2132b; --bs-btn-border-color:#f2132b;
+  --bs-btn-hover-bg:#f2132b; --bs-btn-hover-border-color:#f2132b; --bs-btn-hover-color:#fff;
+  --bs-btn-active-bg:#f2132b; --bs-btn-active-border-color:#f2132b; --bs-btn-active-color:#fff;
 }
-/* opacity-aware so bg-opacity-10 / text-opacity tints still work
-   (a hardcoded colour here would turn .bg-primary.bg-opacity-10 squares solid
-    and hide the same-coloured icon inside them) */
+/* opacity-aware so bg-opacity-10 / text-opacity tints still render (stat icons) */
 .bg-primary       { background-color:rgba(var(--bs-primary-rgb), var(--bs-bg-opacity,1)) !important; }
 .text-primary     { color:rgba(var(--bs-primary-rgb), var(--bs-text-opacity,1)) !important; }
-.link-primary     { color:#f27457 !important; }
-.badge.bg-primary { --bs-bg-opacity:1; background-color:#f27457 !important; }
-.progress-bar     { background-color:#f27457; }
-.btn-link         { color:#03a6a6; }
+.link-primary     { color:#f2132b !important; }
+.badge.bg-primary { --bs-bg-opacity:1; background-color:#f2132b !important; }
+.progress-bar     { background-color:#f2132b; }
+.btn-link         { color:#f2132b; }
 
 /* ---------- Brand accent helpers ---------- */
-.text-teal  { color:#03a6a6 !important; }
-.bg-teal    { background-color:#03a6a6 !important; }
-.text-coral { color:#f27457 !important; }
-.bg-coral   { background-color:#f27457 !important; }
-a:not(.btn):not(.nav-link):not(.navbar-brand) { color:#03a6a6; }
-a:not(.btn):not(.nav-link):not(.navbar-brand):hover { color:#0d5152; }
+.text-red  { color:#f2132b !important; }
+.bg-red    { background-color:#f2132b !important; }
+.text-navy { color:#09101f !important; }
+a:not(.btn):not(.nav-link):not(.navbar-brand) { color:#f2132b; }
+a:not(.btn):not(.nav-link):not(.navbar-brand):hover { color:#c70f22; }
 
-/* ---------- Clean, light, airy sidebar (matches marketing) ---------- */
+/* ---------- Clean, light sidebar ---------- */
 #mainNavbar.bg-white,
 .navbar-vertical.bg-white {
   background-color:#ffffff !important;
-  border-right:1px solid #e6efef;
-  box-shadow:0 0 24px rgba(13,81,82,0.04);
+  border-right:1px solid #ececf1;
+  box-shadow:0 0 24px rgba(9,16,31,0.04);
 }
-/* default nav links: dark-teal text, teal icons */
 #mainNavbar .navbar-nav .nav-link {
-  color:#0d5152 !important;
+  color:#09101f !important;
   border-radius:10px;
   margin:2px 8px;
   transition:background-color .15s ease,color .15s ease;
 }
 #mainNavbar .navbar-nav .nav-link i,
 #mainNavbar .navbar-nav .nav-link .fe {
-  color:#03a6a6 !important;
+  color:#6e727f !important;
 }
 #mainNavbar .navbar-nav .nav-link:hover {
-  background-color:#f2fafa !important;
-  color:#0d5152 !important;
+  background-color:#f7f8fa !important;
+  color:#09101f !important;
 }
-/* active item -> soft coral pill with coral text/icon */
+/* active item -> soft red pill with red text/icon */
 #mainNavbar .navbar-nav .nav-link.active,
 .navbar-vertical .navbar-nav .nav-link.active {
-  background-color:rgba(242,116,87,0.12) !important;
-  color:#f27457 !important;
+  background-color:rgba(242,19,43,0.10) !important;
+  color:#f2132b !important;
   font-weight:600;
 }
 #mainNavbar .navbar-nav .nav-link.active i,
 #mainNavbar .navbar-nav .nav-link.active .fe,
 #mainNavbar .navbar-nav .nav-link.active svg {
-  color:#f27457 !important;
+  color:#f2132b !important;
 }
-/* section headings inside sidebar */
-#mainNavbar .navbar-heading { color:#8aa3a3 !important; }
+#mainNavbar .navbar-heading { color:#9aa0ad !important; }
 
-/* ---------- Logo: never squeeze (preserve aspect ratio) ---------- */
+/* ---------- Logo: preserve aspect ratio ---------- */
 #mainNavbar .navbar-brand-img,
 .navbar-brand .navbar-brand-img {
   height:36px !important;
@@ -93,4 +87,4 @@ a:not(.btn):not(.nav-link):not(.navbar-brand):hover { color:#0d5152; }
 }
 
 /* ---------- Body ---------- */
-body { background-color:#f2fafa; }
+body { background-color:#f7f8fa; }
