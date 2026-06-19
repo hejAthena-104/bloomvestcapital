@@ -7,6 +7,7 @@
     {% load static %}
 
     <meta charset="utf-8">
+    <meta name="csrf-token" content="TuDsCdKJ03MPusFP2GKqzoWGwF8PuVfDi0T5H9qW">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta content="Webinning" name="author">
     <!-- Theme CSS -->
@@ -99,6 +100,7 @@
         }
     </script>
     <!-- Favicon -->
+        <!-- Favicon -->
     <link rel="icon" href="{% static 'images/favicon.png' %}?v=3" type="image/png">
     <link rel="shortcut icon" href="{% static 'images/favicon.png' %}?v=3" type="image/png">
 
@@ -117,7 +119,7 @@
             theme = localStorage.getItem('theme'),
             sidebarSizing = localStorage.getItem('sidebarSizing'),
             linkLTR = document.getElementById('stylesheetLTR'),
-            linkRTL = document.getElementById('stylesheetRTR'),
+            linkRTL = document.getElementById('stylesheetRTL'),
             html = document.documentElement;
 
         if (isRTL) {
@@ -132,14 +134,44 @@
     </script>
 
     <!-- Page Title -->
-    <title>My Investments | Bloomvest Capital</title>
-    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.1/dist/alpine.min.js" defer></script>
+    <title>Swap | Bloomvest Capital</title>
+        <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.1/dist/alpine.min.js" defer></script>
+    <!-- Livewire Styles -->
+<style >
+    [wire\:loading], [wire\:loading\.delay], [wire\:loading\.inline-block], [wire\:loading\.inline], [wire\:loading\.block], [wire\:loading\.flex], [wire\:loading\.table], [wire\:loading\.grid], [wire\:loading\.inline-flex] {
+        display: none;
+    }
+
+    [wire\:loading\.delay\.shortest], [wire\:loading\.delay\.shorter], [wire\:loading\.delay\.short], [wire\:loading\.delay\.long], [wire\:loading\.delay\.longer], [wire\:loading\.delay\.longest] {
+        display:none;
+    }
+
+    [wire\:offline] {
+        display: none;
+    }
+
+    [wire\:dirty]:not(textarea):not(input):not(select) {
+        display: none;
+    }
+
+    input:-webkit-autofill, select:-webkit-autofill, textarea:-webkit-autofill {
+        animation-duration: 50000s;
+        animation-name: livewireautofill;
+    }
+
+    @keyframes livewireautofill { from {} }
+</style>
 </head>
 
 <body>
     <!-- Django Messages -->
     {% include 'includes/messages.html' %}
 
+
+
+    <script>
+
+    </script>
     <!-- THEME CONFIGURATION -->
     <script>
         let themeAttrs = document.documentElement.dataset;
@@ -160,10 +192,8 @@
             }
         }
     </script>
-
     <!-- NAVIGATION -->
     {% include "includes/sidebar.html" %}
-
     <!-- MAIN CONTENT -->
     <main>
         <!-- HEADER -->
@@ -279,7 +309,10 @@
                             fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                             stroke-width="1.5" />
                     </svg>
-                </a>
+                    <div>
+    </div>
+
+<!-- Livewire Component wire-end:Z9Ir4uPXS0jx85STEPs2 -->                </a>
 
                 <!-- Notifications offcanvas -->
                 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNotifications"
@@ -295,10 +328,12 @@
 
                     <div class="offcanvas-body p-0">
                         <div class="list-group list-group-flush">
-                            <div class="text-center py-5 mt-5">
-                                <i class="bi bi-bell-slash fs-1 text-secondary"></i>
-                                <p class="text-secondary">There are no new notifications</p>
-                            </div>
+                            <div>
+            <div class="text-center py-5 mt-5">
+            <i class="bi bi-bell-slash fs-1 text-secondary"></i>
+            <p class="text-secondary">There are no new notifications</p>
+        </div>
+    </div>
 <!-- Smartsupp Live Chat script -->
 <script type="text/javascript">
 var _smartsupp = _smartsupp || {};
@@ -310,7 +345,7 @@ window.smartsupp||(function(d) {
   c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
 })(document);
 </script>
-<noscript> Powered by <a href="https://www.smartsupp.com" target="_blank">Smartsupp</a></noscript>
+<noscript> Powered by <a href=“https://www.smartsupp.com” target=“_blank”>Smartsupp</a></noscript>
 
 <!-- Smartsupp User Identification -->
 <script type="text/javascript">
@@ -344,7 +379,8 @@ window.smartsupp||(function(d) {
     });
 {% endif %}
 </script>
-                        </div>
+
+<!-- Livewire Component wire-end:Vki7xZf1FtI4h1OqmQVU -->                        </div>
                     </div>
                 </div>
                 <!-- Separator -->
@@ -386,8 +422,8 @@ window.smartsupp||(function(d) {
                         <!-- End Dropdown -->
 
                         <a class="dropdown-item" href="{% url 'dashboard:account_settings' %}">Profile & account</a>
-                        <a class="dropdown-item" href="{% url 'dashboard:transfer_funds' %}">Transfer</a>
-                        <hr class="dropdown-divider">
+                                                    <a class="dropdown-item" href="{% url 'dashboard:transfer_funds' %}">Transfer</a>
+                                                <hr class="dropdown-divider">
 
                         <a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}"
                             onclick="event.preventDefault();
@@ -403,70 +439,153 @@ window.smartsupp||(function(d) {
         </header>
 
         <div class="container-fluid mb-5">
-            <div class="container-fluid">
-                <div class="d-flex align-items-baseline justify-content-between">
-                    <!-- Title -->
-                    <h1 class="h2 d-flex align-items-center justify-content-between">
-                        <span>
-                            My Investments
-                        </span>
-                    </h1>
-                    <div class="m-0">
-                        <label class="form-label">Filter</label>
-                        <select class="form-select" id="sortFilter">
-                            <option value="all" {% if filter == 'all' or not filter %}selected{% endif %}>All</option>
-                            <option value="pending" {% if filter == 'pending' %}selected{% endif %}>Pending</option>
-                            <option value="active" {% if filter == 'active' %}selected{% endif %}>Active</option>
-                            <option value="completed" {% if filter == 'completed' %}selected{% endif %}>Completed</option>
-                            <option value="cancelled" {% if filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
-                        </select>
+            <!-- Title -->
+            <h1 class="h2 mb-1">
+                Swap
+            </h1>
+            <p class="text-muted">Instantly convert between USD and BTC</p>
+
+            <!-- Balance + rate cards -->
+            <div class="row g-3 mt-1">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="text-muted">USD Balance</span>
+                                <i class="bi bi-currency-dollar fs-3 text-primary"></i>
+                            </div>
+                            <h2 class="mt-2 mb-0">${{ usd_balance }}</h2>
+                        </div>
                     </div>
                 </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="text-muted">BTC Balance</span>
+                                <i class="bi bi-currency-bitcoin fs-3 text-primary"></i>
+                            </div>
+                            <h2 class="mt-2 mb-0">{{ btc_balance }} BTC</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span>Current rate</span>
+                                <i class="bi bi-arrow-left-right fs-3"></i>
+                            </div>
+                            <h3 class="mt-2 mb-0">1 BTC = ${{ btc_usd_price }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                <div class="row mt-5">
-                    {% if investments %}
-                        {% for investment in investments %}
-                        <div class="col-md-4 mb-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ investment.plan.name }}</h5>
-                                    <p class="mb-1"><strong>Amount:</strong> ${{ investment.amount|floatformat:2 }}</p>
-                                    <p class="mb-1"><strong>Expected Return:</strong> ${{ investment.total_return|floatformat:2 }}</p>
-                                    <p class="mb-1"><strong>Profit Earned:</strong> ${{ investment.profit_earned|floatformat:2 }}</p>
-                                    <p class="mb-1"><strong>Start Date:</strong> {{ investment.start_date|date:"M d, Y" }}</p>
-                                    <p class="mb-1"><strong>End Date:</strong> {{ investment.end_date|date:"M d, Y" }}</p>
-                                    <p class="mb-1">
-                                        <strong>Status:</strong>
-                                        <span class="badge {% if investment.status == 'pending' %}bg-warning text-dark{% elif investment.status == 'active' %}bg-success{% elif investment.status == 'completed' %}bg-primary{% else %}bg-secondary{% endif %}">
-                                            {{ investment.get_status_display }}
-                                        </span>
-                                    </p>
-                                    {% if investment.status == 'active' %}
-                                    <p class="mb-1"><strong>Days Remaining:</strong> {{ investment.days_remaining }}</p>
-                                    <div class="progress mt-2" style="height: 20px;">
-                                        <div class="progress-bar" role="progressbar" style="width: {{ investment.progress_percentage }}%;"
-                                             aria-valuenow="{{ investment.progress_percentage }}" aria-valuemin="0" aria-valuemax="100">
-                                            {{ investment.progress_percentage|floatformat:0 }}%
-                                        </div>
-                                    </div>
-                                    {% endif %}
+            <!-- Swap form -->
+            <div class="row mt-4">
+                <div class="col-lg-7">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title mb-4">
+                                <i class="bi bi-arrow-left-right me-2 text-primary"></i>Swap funds
+                            </h3>
+                            <form method="post" action="{% url 'dashboard:swap' %}" id="swapForm">
+                                {% csrf_token %}
+
+                                <!-- Direction toggle -->
+                                <label class="form-label">Direction</label>
+                                <div class="btn-group w-100 mb-4" role="group" aria-label="Swap direction">
+                                    <input type="radio" class="btn-check" name="direction" id="dirUsdToBtc"
+                                        value="usd_to_btc" autocomplete="off" checked>
+                                    <label class="btn btn-outline-primary" for="dirUsdToBtc">
+                                        <i class="bi bi-currency-dollar"></i> USD &rarr; BTC
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="direction" id="dirBtcToUsd"
+                                        value="btc_to_usd" autocomplete="off">
+                                    <label class="btn btn-outline-primary" for="dirBtcToUsd">
+                                        <i class="bi bi-currency-bitcoin"></i> BTC &rarr; USD
+                                    </label>
                                 </div>
+
+                                <!-- Amount -->
+                                <div class="mb-3">
+                                    <label class="form-label" for="swapAmount">Amount</label>
+                                    <input class="form-control" id="swapAmount" type="number" step="any" min="0"
+                                        name="amount" placeholder="Enter amount" required>
+                                </div>
+
+                                <!-- Estimate -->
+                                <div class="alert alert-light border d-flex align-items-center justify-content-between mb-4">
+                                    <span class="text-muted">You will receive</span>
+                                    <span class="fw-bold fs-5" id="receiveEstimate">0.00</span>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-arrow-left-right me-1"></i> Swap now
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent swaps -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title mb-3">Recent swaps</h3>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Direction</th>
+                                            <th>From</th>
+                                            <th>To</th>
+                                            <th>Rate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for swap in swaps %}
+                                        <tr>
+                                            <td>{{ swap.created_at|date:"M d, Y H:i" }}</td>
+                                            <td>
+                                                <span class="badge rounded-pill text-bg-primary">
+                                                    {{ swap.get_direction_display }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {% if swap.direction == 'usd_to_btc' %}
+                                                    ${{ swap.from_amount }}
+                                                {% else %}
+                                                    {{ swap.from_amount }} BTC
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if swap.direction == 'usd_to_btc' %}
+                                                    {{ swap.to_amount }} BTC
+                                                {% else %}
+                                                    ${{ swap.to_amount }}
+                                                {% endif %}
+                                            </td>
+                                            <td>${{ swap.rate_used }}</td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted py-4">
+                                                <i class="bi bi-arrow-left-right d-block fs-3 mb-2"></i>
+                                                No swaps yet.
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="text-center card-body">
-                                    <i class="bi bi-database-fill-exclamation" style="font-size: 50px"></i>
-                                    <p class="h3">
-                                        You do not have an investment plan at the moment
-                                    </p>
-                                    <a href="{% url 'dashboard:buy_plan' %}" class="px-3 btn btn-primary">Buy a plan</a>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -480,8 +599,8 @@ window.smartsupp||(function(d) {
                     </div>
 
                     <div class="col-auto">
-                        <div id="google_translate_element"></div>
-                    </div>
+                                                    <div id="google_translate_element"></div>
+                                            </div>
                 </div> <!-- / .row -->
             </div>
         </footer>
@@ -494,23 +613,53 @@ window.smartsupp||(function(d) {
             <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
         </script>
 
-    <script type="text/javascript">
-        function googleTranslateElementInit() {
-            new google.translate.TranslateElement({
-                pageLanguage: 'en'
-            }, 'google_translate_element');
-        }
-
-        // Filter functionality
-        document.getElementById('sortFilter').addEventListener('change', function() {
-            const filter = this.value;
-            window.location.href = '{% url "dashboard:my_plans" %}?filter=' + filter;
-        });
-    </script>
-
+        <script type="text/javascript">
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                    pageLanguage: 'en'
+                }, 'google_translate_element');
+            }
+        </script>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"
         integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
-</body>
+
+    <script>
+        // Live swap estimate
+        var BTC_USD_PRICE = parseFloat('{{ btc_usd_price }}') || 0;
+
+        var amountInput = document.getElementById('swapAmount');
+        var estimateEl = document.getElementById('receiveEstimate');
+        var dirRadios = document.querySelectorAll('input[name="direction"]');
+
+        function getDirection() {
+            var checked = document.querySelector('input[name="direction"]:checked');
+            return checked ? checked.value : 'usd_to_btc';
+        }
+
+        function updateEstimate() {
+            var amount = parseFloat(amountInput.value) || 0;
+            var direction = getDirection();
+            var received = 0;
+            var suffix = '';
+
+            if (direction === 'usd_to_btc') {
+                received = BTC_USD_PRICE > 0 ? amount / BTC_USD_PRICE : 0;
+                estimateEl.textContent = received.toFixed(8) + ' BTC';
+            } else {
+                received = amount * BTC_USD_PRICE;
+                estimateEl.textContent = '$' + received.toFixed(2);
+            }
+        }
+
+        if (amountInput && estimateEl) {
+            amountInput.addEventListener('input', updateEstimate);
+            dirRadios.forEach(function(r) {
+                r.addEventListener('change', updateEstimate);
+            });
+            updateEstimate();
+        }
+    </script>
+    </body>
 
 </html>

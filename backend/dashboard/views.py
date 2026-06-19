@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.db.models import Sum, Q, Count
 from django.db import transaction
@@ -10,8 +11,11 @@ import random
 import string
 
 from accounts.models import User, Notification
-from investments.models import InvestmentPlan, Investment, ProfitHistory, PaymentMethod
-from transactions.models import Transaction, Deposit, Withdrawal, Transfer
+from transactions.models import (
+    Transaction, Deposit, Withdrawal, Transfer, PaymentMethod,
+    SwapRate, Swap, Beneficiary, ExternalTransfer,
+)
+from services.models import LoanApplication, GrantApplication, CardApplication, Card
 from support.models import SupportTicket, EmailLog
 from accounts.email_utils import EmailService
 
@@ -21,14 +25,6 @@ def dashboard_index(request):
     """Main dashboard view with comprehensive statistics"""
     user = request.user
 
-    # Get user's investments
-    active_investments = Investment.objects.filter(user=user, status='active')
-    total_investments = Investment.objects.filter(user=user)
-
-    # Calculate statistics
-    total_invested = total_investments.aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
-    total_profit = ProfitHistory.objects.filter(user=user).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
-
     # Get recent transactions
     recent_transactions = Transaction.objects.filter(user=user).order_by('-created_at')[:5]
 
@@ -36,141 +32,23 @@ def dashboard_index(request):
     pending_deposits = Transaction.objects.filter(user=user, type='deposit', status='pending').count()
     pending_withdrawals = Transaction.objects.filter(user=user, type='withdrawal', status='pending').count()
 
-    # Get active investments count
-    active_investments_count = active_investments.count()
-
-    # Calculate total earnings (profits + bonuses + referrals)
-    total_earnings = user.total_profit + user.total_bonus + user.referral_bonus
-
-    # Get recent profits
-    recent_profits = ProfitHistory.objects.filter(user=user).order_by('-date')[:5]
+    # Total earnings (bonuses + referrals)
+    total_earnings = user.total_bonus + user.referral_bonus
 
     context = {
         'user': user,
-        'total_invested': total_invested,
-        'total_profit': total_profit,
         'total_earnings': total_earnings,
         'current_balance': user.balance,
-        'active_investments': active_investments[:3],  # Show only 3 on dashboard
-        'active_investments_count': active_investments_count,
+        'btc_balance': user.btc_balance,
         'recent_transactions': recent_transactions,
-        'recent_profits': recent_profits,
         'pending_deposits': pending_deposits,
         'pending_withdrawals': pending_withdrawals,
         'referral_count': user.referrals.count(),
         'referral_code': user.referral_code,
+        'cards': Card.objects.filter(user=user)[:3],
     }
 
     return render(request, 'dashboard/index.html', context)
-
-
-@login_required
-def my_plans(request):
-    """View user's investments"""
-    user = request.user
-
-    # Get filter parameter
-    filter_status = request.GET.get('filter', 'all')
-
-    # Get investments based on filter
-    if filter_status == 'pending':
-        investments = Investment.objects.filter(user=user, status='pending').order_by('-created_at')
-    elif filter_status == 'active':
-        investments = Investment.objects.filter(user=user, status='active').order_by('-created_at')
-    elif filter_status == 'completed':
-        investments = Investment.objects.filter(user=user, status='completed').order_by('-completed_date')
-    elif filter_status == 'cancelled':
-        investments = Investment.objects.filter(user=user, status='cancelled').order_by('-created_at')
-    else:
-        # All investments
-        investments = Investment.objects.filter(user=user).order_by('-created_at')
-
-    context = {
-        'user': user,
-        'investments': investments,
-        'filter': filter_status,
-    }
-
-    return render(request, 'dashboard/myplans/All/index.html', context)
-
-@login_required
-def buy_plan(request):
-    """View and purchase investment plans"""
-    plans = InvestmentPlan.objects.filter(is_active=True).order_by('order')
-
-    if request.method == 'POST':
-        plan_id = request.POST.get('plan_id')
-        amount = request.POST.get('amount', '0')
-
-        # Validate amount format
-        try:
-            amount = Decimal(str(amount).strip())
-            if amount <= 0:
-                messages.error(request, 'Please enter a valid positive amount')
-                return redirect('dashboard:buy_plan')
-        except (InvalidOperation, ValueError):
-            messages.error(request, 'Invalid amount entered')
-            return redirect('dashboard:buy_plan')
-
-        # Validate plan exists
-        try:
-            plan = InvestmentPlan.objects.get(id=plan_id, is_active=True)
-        except InvestmentPlan.DoesNotExist:
-            messages.error(request, 'Invalid investment plan selected')
-            return redirect('dashboard:buy_plan')
-
-        # Validate amount against plan limits
-        if amount < plan.min_amount:
-            messages.error(request, f'Minimum investment amount is ${plan.min_amount}')
-            return redirect('dashboard:buy_plan')
-
-        if plan.max_amount and amount > plan.max_amount:
-            messages.error(request, f'Maximum investment amount is ${plan.max_amount}')
-            return redirect('dashboard:buy_plan')
-
-        # Use atomic transaction to prevent race conditions
-        try:
-            with transaction.atomic():
-                # Lock user row for update to prevent concurrent balance modifications
-                user = User.objects.select_for_update().get(pk=request.user.pk)
-
-                # Check balance with locked row
-                if user.balance < amount:
-                    messages.error(request, 'Insufficient balance. Please make a deposit first.')
-                    return redirect('dashboard:deposits')
-
-                # Deduct from user balance first
-                user.balance -= amount
-                user.save()
-
-                # Create investment
-                investment = Investment.objects.create(
-                    user=user,
-                    plan=plan,
-                    amount=amount
-                )
-
-                # Create notification
-                Notification.objects.create(
-                    user=user,
-                    title='Investment Created',
-                    message=f'You have successfully invested ${amount} in {plan.name}',
-                    type='investment'
-                )
-
-            messages.success(request, f'Successfully invested ${amount} in {plan.name}!')
-            return redirect('dashboard:my_plans')
-
-        except Exception as e:
-            messages.error(request, f'Error creating investment: {str(e)}')
-
-    context = {
-        'user': request.user,
-        'plans': plans,
-    }
-
-    return render(request, 'dashboard/buy-plan.html', context)
-
 
 @login_required
 def deposits(request):
@@ -458,19 +336,6 @@ def request_otp(request):
     messages.success(request, f'OTP sent to your email: {request.user.email}. (DEBUG: {otp})')
 
     return redirect('dashboard:withdraw_funds')
-
-
-@login_required
-def profit_history(request):
-    """View profit history"""
-    profits = ProfitHistory.objects.filter(user=request.user).order_by('-date')
-
-    context = {
-        'user': request.user,
-        'profits': profits,
-    }
-
-    return render(request, 'dashboard/profit-history.html', context)
 
 
 @login_required
@@ -843,3 +708,261 @@ def send_email(request):
     }
 
     return render(request, 'dashboard/send-email.html', context)
+
+
+# ============================================================
+#  NEW FEATURES: Swap · Transfers · Beneficiaries · Loans · Grants · Cards · PIN
+# ============================================================
+
+def _to_decimal(value):
+    try:
+        return Decimal(str(value).strip())
+    except (InvalidOperation, ValueError, TypeError):
+        return None
+
+
+@login_required
+def swap(request):
+    """Instant USD <-> BTC swap at the admin-set rate."""
+    user = request.user
+    rate = SwapRate.current()
+    price = rate.btc_usd_price
+
+    if request.method == 'POST':
+        direction = request.POST.get('direction', 'usd_to_btc')
+        amount = _to_decimal(request.POST.get('amount'))
+        if amount is None or amount <= 0:
+            messages.error(request, 'Enter a valid amount.')
+            return redirect('dashboard:swap')
+
+        # Atomic read-check-mutate-save with a row lock to prevent TOCTOU double-spend.
+        with transaction.atomic():
+            locked = User.objects.select_for_update().get(pk=user.pk)
+            if direction == 'usd_to_btc':
+                if locked.balance < amount:
+                    messages.error(request, 'Insufficient USD balance.')
+                    return redirect('dashboard:swap')
+                btc = (amount / price).quantize(Decimal('0.00000001'))
+                locked.balance -= amount
+                locked.btc_balance += btc
+                locked.save()
+                Swap.objects.create(user=locked, direction='usd_to_btc', from_amount=amount,
+                                    to_amount=btc, rate_used=price)
+                Transaction.objects.create(user=locked, type='swap', amount=amount, status='approved',
+                                           description=f'Swapped ${amount} USD to {btc} BTC')
+                messages.success(request, f'Swapped ${amount} to {btc} BTC.')
+            else:  # btc_to_usd
+                if locked.btc_balance < amount:
+                    messages.error(request, 'Insufficient BTC balance.')
+                    return redirect('dashboard:swap')
+                usd = (amount * price).quantize(Decimal('0.01'))
+                locked.btc_balance -= amount
+                locked.balance += usd
+                locked.save()
+                Swap.objects.create(user=locked, direction='btc_to_usd', from_amount=amount,
+                                    to_amount=usd, rate_used=price)
+                Transaction.objects.create(user=locked, type='swap', amount=usd, status='approved',
+                                           description=f'Swapped {amount} BTC to ${usd} USD')
+                messages.success(request, f'Swapped {amount} BTC to ${usd}.')
+        return redirect('dashboard:swap')
+
+    context = {
+        'user': user,
+        'btc_usd_price': price,
+        'usd_balance': user.balance,
+        'btc_balance': user.btc_balance,
+        'swaps': Swap.objects.filter(user=user)[:10],
+    }
+    return render(request, 'dashboard/swap.html', context)
+
+
+@login_required
+def transfers(request):
+    """Transfers hub: tabbed Local / International + saved beneficiaries."""
+    user = request.user
+    context = {
+        'user': user,
+        'usd_balance': user.balance,
+        'beneficiaries': Beneficiary.objects.filter(user=user),
+        'has_pin': user.has_transaction_pin,
+        'recent_transfers': Transaction.objects.filter(user=user, type='withdrawal').order_by('-created_at')[:10],
+    }
+    return render(request, 'dashboard/transfer.html', context)
+
+
+def _create_external_transfer(request, transfer_type, method, data):
+    """Shared: validate PIN + balance, create pending Transaction + ExternalTransfer."""
+    user = request.user
+    amount = _to_decimal(data.get('amount'))
+    if amount is None or amount <= 0:
+        messages.error(request, 'Enter a valid amount.')
+        return False
+    if not user.has_transaction_pin:
+        messages.error(request, 'Please set a Transaction PIN in Account Settings first.')
+        return False
+    if not user.check_transaction_pin(data.get('transaction_pin', '')):
+        messages.error(request, 'Invalid Transaction PIN.')
+        return False
+    if user.balance < amount:
+        messages.error(request, 'Insufficient balance for this transfer.')
+        return False
+
+    txn = Transaction.objects.create(
+        user=user, type='withdrawal', amount=amount, status='pending',
+        payment_method='bank_transfer' if method in ('local_bank', 'wire') else method,
+        description=data.get('description', '') or f'{transfer_type.title()} transfer',
+    )
+    bene = None
+    bid = data.get('beneficiary_id')
+    if bid:
+        bene = Beneficiary.objects.filter(user=user, pk=bid).first()
+    ExternalTransfer.objects.create(
+        transaction=txn, beneficiary=bene, transfer_type=transfer_type, method=method,
+        account_holder_name=data.get('account_holder_name', ''),
+        account_number=data.get('account_number', ''),
+        bank_name=data.get('bank_name', ''),
+        account_type=data.get('account_type', ''),
+        routing_number=data.get('routing_number', ''),
+        swift_code=data.get('swift_code', ''),
+        country=data.get('country', ''),
+        extra={k: v for k, v in data.items() if k in ('email', 'tag', 'wallet_address', 'phone')},
+    )
+    Notification.objects.create(user=user, type='withdrawal', title='Transfer Submitted',
+                                message=f'Your {transfer_type} transfer of ${amount} is pending review.')
+    # Optionally save as beneficiary
+    if data.get('save_beneficiary') and not bene:
+        Beneficiary.objects.create(
+            user=user, nickname=data.get('account_holder_name') or 'Beneficiary',
+            type='local_bank' if transfer_type == 'local' else method,
+            account_holder_name=data.get('account_holder_name', ''),
+            account_number=data.get('account_number', ''), bank_name=data.get('bank_name', ''),
+            account_type=data.get('account_type', ''), routing_number=data.get('routing_number', ''),
+            swift_code=data.get('swift_code', ''), country=data.get('country', ''),
+        )
+    messages.success(request, f'{transfer_type.title()} transfer of ${amount} submitted for review.')
+    return True
+
+
+@login_required
+def local_transfer(request):
+    if request.method == 'POST':
+        _create_external_transfer(request, 'local', 'local_bank', request.POST)
+    return redirect('dashboard:transfers')
+
+
+@login_required
+def international_transfer(request):
+    if request.method == 'POST':
+        method = request.POST.get('method', 'wire')
+        _create_external_transfer(request, 'international', method, request.POST)
+    return redirect('dashboard:transfers')
+
+
+@login_required
+def save_beneficiary(request):
+    if request.method == 'POST':
+        Beneficiary.objects.create(
+            user=request.user,
+            nickname=request.POST.get('nickname') or request.POST.get('account_holder_name') or 'Beneficiary',
+            type=request.POST.get('type', 'local_bank'),
+            account_holder_name=request.POST.get('account_holder_name', ''),
+            account_number=request.POST.get('account_number', ''),
+            bank_name=request.POST.get('bank_name', ''),
+            account_type=request.POST.get('account_type', ''),
+            routing_number=request.POST.get('routing_number', ''),
+            swift_code=request.POST.get('swift_code', ''),
+            country=request.POST.get('country', ''),
+        )
+        messages.success(request, 'Beneficiary saved.')
+    return redirect('dashboard:transfers')
+
+
+@login_required
+@require_POST
+def delete_beneficiary(request, pk):
+    Beneficiary.objects.filter(user=request.user, pk=pk).delete()
+    messages.success(request, 'Beneficiary removed.')
+    return redirect('dashboard:transfers')
+
+
+@login_required
+def loans(request):
+    user = request.user
+    if request.method == 'POST':
+        amount = _to_decimal(request.POST.get('amount'))
+        if amount is None or amount <= 0:
+            messages.error(request, 'Enter a valid loan amount.')
+            return redirect('dashboard:loans')
+        LoanApplication.objects.create(
+            user=user, amount=amount,
+            purpose=request.POST.get('purpose', 'personal'),
+            term_months=int(request.POST.get('term_months') or 12),
+            monthly_income=_to_decimal(request.POST.get('monthly_income')) or 0,
+            employment_status=request.POST.get('employment_status', ''),
+            details=request.POST.get('details', ''),
+        )
+        messages.success(request, 'Loan application submitted for review.')
+        return redirect('dashboard:loans')
+    context = {'user': user, 'applications': LoanApplication.objects.filter(user=user)}
+    return render(request, 'dashboard/loans.html', context)
+
+
+@login_required
+def grants(request):
+    user = request.user
+    if request.method == 'POST':
+        amount = _to_decimal(request.POST.get('amount'))
+        if amount is None or amount <= 0:
+            messages.error(request, 'Enter a valid grant amount.')
+            return redirect('dashboard:grants')
+        GrantApplication.objects.create(
+            user=user, amount=amount,
+            applicant_type=request.POST.get('applicant_type', 'individual'),
+            purpose=request.POST.get('purpose', ''),
+            details=request.POST.get('details', ''),
+            full_name=request.POST.get('full_name', ''),
+            business_name=request.POST.get('business_name', ''),
+            registration_number=request.POST.get('registration_number', ''),
+            business_type=request.POST.get('business_type', ''),
+        )
+        messages.success(request, 'Grant application submitted for review.')
+        return redirect('dashboard:grants')
+    context = {'user': user, 'applications': GrantApplication.objects.filter(user=user)}
+    return render(request, 'dashboard/grants.html', context)
+
+
+@login_required
+def cards(request):
+    user = request.user
+    if request.method == 'POST':
+        CardApplication.objects.create(
+            user=user,
+            card_type=request.POST.get('card_type', 'virtual_debit'),
+            card_brand=request.POST.get('card_brand', 'Visa'),
+            full_name=request.POST.get('full_name', '') or user.get_full_name(),
+            delivery_address=request.POST.get('delivery_address', ''),
+        )
+        messages.success(request, 'Card application submitted for review.')
+        return redirect('dashboard:cards')
+    context = {
+        'user': user,
+        'applications': CardApplication.objects.filter(user=user),
+        'cards': Card.objects.filter(user=user),
+    }
+    return render(request, 'dashboard/cards.html', context)
+
+
+@login_required
+def set_transaction_pin(request):
+    if request.method == 'POST':
+        pin = (request.POST.get('pin') or '').strip()
+        confirm = (request.POST.get('confirm_pin') or '').strip()
+        if not pin.isdigit() or not (4 <= len(pin) <= 6):
+            messages.error(request, 'PIN must be 4-6 digits.')
+        elif pin != confirm:
+            messages.error(request, 'PINs do not match.')
+        else:
+            request.user.set_transaction_pin(pin)
+            request.user.save()
+            messages.success(request, 'Transaction PIN saved.')
+    return redirect('dashboard:account_settings')

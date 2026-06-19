@@ -263,3 +263,87 @@ class TransferAdmin(admin.ModelAdmin):
                 cancelled_count += 1
         self.message_user(request, f'{cancelled_count} transfer(s) cancelled.')
     cancel_transfers.short_description = 'Cancel selected transfers'
+
+
+def _status_badge(status):
+    colors = {'pending': 'orange', 'processing': 'blue', 'approved': 'green',
+              'completed': 'green', 'active': 'green', 'rejected': 'red',
+              'cancelled': 'gray', 'frozen': 'blue', 'blocked': 'red'}
+    color = colors.get(status, 'gray')
+    return format_html(
+        '<span style="background-color: {}; color: white; padding: 3px 10px; border-radius: 3px; font-weight: bold;">{}</span>',
+        color, str(status).upper())
+
+
+from .models import PaymentMethod, SwapRate, Swap, Beneficiary, ExternalTransfer
+
+
+@admin.register(PaymentMethod)
+class PaymentMethodAdmin(admin.ModelAdmin):
+    list_display = ('name', 'type', 'min_amount', 'max_amount', 'is_active', 'order')
+    list_filter = ('type', 'is_active')
+    search_fields = ('name',)
+    list_editable = ('is_active', 'order')
+
+
+@admin.register(SwapRate)
+class SwapRateAdmin(admin.ModelAdmin):
+    list_display = ('btc_usd_price', 'is_active', 'updated_at')
+    list_editable = ('is_active',)
+
+
+@admin.register(Swap)
+class SwapAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'direction', 'from_amount', 'to_amount', 'rate_used', 'created_at')
+    list_filter = ('direction', 'created_at')
+    search_fields = ('user__username', 'user__email')
+    readonly_fields = ('created_at',)
+
+
+@admin.register(Beneficiary)
+class BeneficiaryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'nickname', 'type', 'account_number', 'bank_name', 'created_at')
+    list_filter = ('type', 'created_at')
+    search_fields = ('user__username', 'nickname', 'account_number', 'bank_name')
+
+
+@admin.register(ExternalTransfer)
+class ExternalTransferAdmin(admin.ModelAdmin):
+    list_display = ('id', 'transfer_user', 'transfer_type', 'method', 'amount', 'status_badge',
+                    'account_holder_name', 'bank_name', 'created_at')
+    list_filter = ('transfer_type', 'method')
+    search_fields = ('transaction__user__username', 'account_holder_name', 'account_number', 'bank_name')
+    actions = ['approve_transfers', 'reject_transfers']
+
+    def transfer_user(self, obj):
+        return obj.transaction.user
+    transfer_user.short_description = 'User'
+
+    def amount(self, obj):
+        return obj.transaction.amount
+    amount.short_description = 'Amount'
+
+    def created_at(self, obj):
+        return obj.transaction.created_at
+    created_at.short_description = 'Created'
+
+    def status_badge(self, obj):
+        return _status_badge(obj.transaction.status)
+    status_badge.short_description = 'Status'
+
+    def approve_transfers(self, request, queryset):
+        n = 0
+        for et in queryset.select_related('transaction'):
+            if et.transaction.status == 'pending' and et.transaction.approve():
+                n += 1
+        self.message_user(request, f'{n} transfer(s) approved (balance debited).')
+    approve_transfers.short_description = 'Approve selected transfers'
+
+    def reject_transfers(self, request, queryset):
+        n = 0
+        for et in queryset.select_related('transaction'):
+            if et.transaction.status == 'pending':
+                et.transaction.reject('Rejected by admin')
+                n += 1
+        self.message_user(request, f'{n} transfer(s) rejected.')
+    reject_transfers.short_description = 'Reject selected transfers'

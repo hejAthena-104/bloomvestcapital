@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from decimal import Decimal
 from accounts.models import User
 
 
@@ -13,6 +14,9 @@ class Transaction(models.Model):
         ('bonus', 'Bonus'),
         ('referral', 'Referral Bonus'),
         ('profit', 'Profit'),
+        ('swap', 'Currency Swap'),
+        ('loan', 'Loan Disbursement'),
+        ('grant', 'Grant Disbursement'),
     ]
 
     STATUS_CHOICES = [
@@ -80,7 +84,7 @@ class Transaction(models.Model):
                 self.user.balance -= self.amount
             else:
                 return False  # Insufficient balance
-        elif self.type in ['bonus', 'referral', 'profit']:
+        elif self.type in ['bonus', 'referral', 'profit', 'loan', 'grant']:
             self.user.balance += self.amount
 
         self.user.save()
@@ -202,3 +206,181 @@ class Transfer(models.Model):
             self.save()
             return True
         return False
+
+
+class PaymentMethod(models.Model):
+    """Payment methods (deposit & withdrawal). Relocated from the removed investments app."""
+
+    TYPE_CHOICES = [
+        ('deposit', 'Deposit Only'),
+        ('withdrawal', 'Withdrawal Only'),
+        ('both', 'Both'),
+    ]
+
+    CHARGE_TYPE_CHOICES = [
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage'),
+    ]
+
+    name = models.CharField(max_length=50, unique=True, help_text="e.g., USDT, Bitcoin, Ethereum")
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='both')
+    icon = models.ImageField(upload_to='payment_methods/', blank=True, null=True)
+
+    min_amount = models.DecimalField(max_digits=15, decimal_places=2, default=10.00)
+    max_amount = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True, help_text="Leave blank for no limit")
+
+    charge_type = models.CharField(max_length=20, choices=CHARGE_TYPE_CHOICES, default='percentage')
+    charge_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Amount or percentage based on charge type")
+
+    duration = models.CharField(max_length=100, blank=True, help_text="e.g., '1-24 hours', 'Instant'")
+
+    wallet_address = models.CharField(max_length=200, blank=True, help_text="Platform wallet address for receiving payments")
+    qr_code = models.ImageField(upload_to='payment_qr_codes/', blank=True, null=True)
+
+    is_active = models.BooleanField(default=True)
+    order = models.IntegerField(default=0, help_text="Display order")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Payment Method'
+        verbose_name_plural = 'Payment Methods'
+        ordering = ['order', 'name']
+
+    def __str__(self):
+        return f"{self.name} ({self.get_type_display()})"
+
+    def calculate_charge(self, amount):
+        if self.charge_type == 'fixed':
+            return self.charge_amount
+        return (amount * self.charge_amount) / 100
+
+    def get_total_amount(self, base_amount):
+        return base_amount + self.calculate_charge(base_amount)
+
+
+class SwapRate(models.Model):
+    """Admin-set USD price of 1 BTC. Single active row drives the USD<->BTC swap."""
+    btc_usd_price = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('65000.00'),
+                                        help_text="Price of 1 BTC in USD")
+    is_active = models.BooleanField(default=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Swap Rate'
+        verbose_name_plural = 'Swap Rate'
+        ordering = ['-updated_at']
+
+    def __str__(self):
+        return f"1 BTC = ${self.btc_usd_price}"
+
+    @classmethod
+    def current(cls):
+        rate = cls.objects.filter(is_active=True).order_by('-updated_at').first()
+        if not rate:
+            rate = cls.objects.create()
+        return rate
+
+
+class Swap(models.Model):
+    """Instant USD<->BTC conversion at the admin-set rate."""
+    DIRECTION_CHOICES = [
+        ('usd_to_btc', 'USD to BTC'),
+        ('btc_to_usd', 'BTC to USD'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='swaps')
+    direction = models.CharField(max_length=20, choices=DIRECTION_CHOICES)
+    from_amount = models.DecimalField(max_digits=20, decimal_places=8)
+    to_amount = models.DecimalField(max_digits=20, decimal_places=8)
+    rate_used = models.DecimalField(max_digits=15, decimal_places=2, help_text="BTC/USD price applied")
+    status = models.CharField(max_length=20, default='completed')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Swap'
+        verbose_name_plural = 'Swaps'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.get_direction_display()} - {self.from_amount}"
+
+
+class Beneficiary(models.Model):
+    """Saved transfer recipient (bank / wire / crypto / wallet service)."""
+    TYPE_CHOICES = [
+        ('local_bank', 'Local Bank'),
+        ('wire', 'International Wire'),
+        ('crypto', 'Cryptocurrency'),
+        ('paypal', 'PayPal'),
+        ('wise', 'Wise'),
+        ('cashapp', 'Cash App'),
+        ('other', 'Other'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='beneficiaries')
+    nickname = models.CharField(max_length=100, help_text="Label for this beneficiary")
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='local_bank')
+
+    account_holder_name = models.CharField(max_length=150, blank=True)
+    account_number = models.CharField(max_length=100, blank=True)
+    bank_name = models.CharField(max_length=150, blank=True)
+    account_type = models.CharField(max_length=50, blank=True)
+    routing_number = models.CharField(max_length=50, blank=True)
+    swift_code = models.CharField(max_length=50, blank=True)
+    country = models.CharField(max_length=100, blank=True)
+    extra = models.JSONField(default=dict, blank=True, help_text="Method-specific details (email, tag, wallet, etc.)")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Beneficiary'
+        verbose_name_plural = 'Beneficiaries'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.nickname} ({self.get_type_display()})"
+
+
+class ExternalTransfer(models.Model):
+    """Local / International outbound transfer detail. OneToOne to a pending withdrawal
+    Transaction so it reuses Transaction.approve() to debit balance on admin approval."""
+    TRANSFER_TYPE_CHOICES = [
+        ('local', 'Local Transfer'),
+        ('international', 'International Transfer'),
+    ]
+    METHOD_CHOICES = [
+        ('local_bank', 'Local Bank'),
+        ('wire', 'Wire Transfer'),
+        ('crypto', 'Cryptocurrency'),
+        ('paypal', 'PayPal'),
+        ('wise', 'Wise'),
+        ('cashapp', 'Cash App'),
+        ('other', 'Other'),
+    ]
+
+    transaction = models.OneToOneField(Transaction, on_delete=models.CASCADE, related_name='external_transfer')
+    beneficiary = models.ForeignKey(Beneficiary, on_delete=models.SET_NULL, null=True, blank=True, related_name='transfers')
+
+    transfer_type = models.CharField(max_length=20, choices=TRANSFER_TYPE_CHOICES)
+    method = models.CharField(max_length=20, choices=METHOD_CHOICES, default='local_bank')
+    fee = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+
+    # Snapshot of recipient details at submission time
+    account_holder_name = models.CharField(max_length=150, blank=True)
+    account_number = models.CharField(max_length=100, blank=True)
+    bank_name = models.CharField(max_length=150, blank=True)
+    account_type = models.CharField(max_length=50, blank=True)
+    routing_number = models.CharField(max_length=50, blank=True)
+    swift_code = models.CharField(max_length=50, blank=True)
+    country = models.CharField(max_length=100, blank=True)
+    extra = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        verbose_name = 'External Transfer'
+        verbose_name_plural = 'External Transfers'
+        ordering = ['-transaction__created_at']
+
+    def __str__(self):
+        return f"{self.get_transfer_type_display()} - {self.transaction}"

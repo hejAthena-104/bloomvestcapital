@@ -55,10 +55,38 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'withdrawals' %}active{% endif %}"
-                       href="{% url 'dashboard:withdrawals' %}">
-                        <i class="bi bi-graph-down nav-link-icon fs-3"></i>
-                        <span>Withdraw</span>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'swap' %}active{% endif %}"
+                       href="{% url 'dashboard:swap' %}">
+                        <i class="bi bi-arrow-left-right nav-link-icon fs-3"></i>
+                        <span>Swap</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name in 'transfers,local_transfer,international_transfer' %}active{% endif %}"
+                       href="{% url 'dashboard:transfers' %}">
+                        <i class="bi bi-send nav-link-icon fs-3"></i>
+                        <span>Transfers</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'loans' %}active{% endif %}"
+                       href="{% url 'dashboard:loans' %}">
+                        <i class="bi bi-cash-coin nav-link-icon fs-3"></i>
+                        <span>Loans</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'grants' %}active{% endif %}"
+                       href="{% url 'dashboard:grants' %}">
+                        <i class="bi bi-gift nav-link-icon fs-3"></i>
+                        <span>Grants</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'cards' %}active{% endif %}"
+                       href="{% url 'dashboard:cards' %}">
+                        <i class="bi bi-credit-card-2-front nav-link-icon fs-3"></i>
+                        <span>Cards</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -67,30 +95,6 @@
                         <i class="bi bi-clock-history nav-link-icon fs-3"></i>
                         <span>Transaction History</span>
                     </a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link {% if request.resolver_match.url_name in 'buy_plan,my_plans' %}active{% endif %}"
-                       href="#pagesCollapse" data-bs-toggle="collapse"
-                        role="button" aria-expanded="false" aria-controls="pagesCollapse">
-                        <i class="bi bi-bounding-box nav-link-icon fs-3"></i>
-                        <span>Investment</span>
-                    </a>
-                    <div class="collapse" id="pagesCollapse">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <a href="{% url 'dashboard:buy_plan' %}"
-                                   class="nav-link {% if request.resolver_match.url_name == 'buy_plan' %}active{% endif %}">
-                                    <span>Invest</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{% url 'dashboard:my_plans' %}"
-                                   class="nav-link {% if request.resolver_match.url_name == 'my_plans' %}active{% endif %}">
-                                    <span>My investments</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'refer_user' %}active{% endif %}"

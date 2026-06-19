@@ -44,6 +44,12 @@ class User(AbstractUser):
         default=0.00,
         help_text="Total earnings from referrals"
     )
+    btc_balance = models.DecimalField(
+        max_digits=20,
+        decimal_places=8,
+        default=0,
+        help_text="User's BTC balance (from USD<->BTC swaps)"
+    )
 
     # Referral System
     referral_code = models.CharField(
@@ -69,6 +75,10 @@ class User(AbstractUser):
 
     # Security
     withdrawal_otp = models.CharField(max_length=6, blank=True, null=True)
+    transaction_pin = models.CharField(
+        max_length=128, blank=True,
+        help_text="Hashed transaction PIN for authorising transfers"
+    )
 
     # Bank Details
     bank_name = models.CharField(max_length=200, blank=True)
@@ -141,6 +151,21 @@ class User(AbstractUser):
         """Return user's full name or username"""
         full_name = super().get_full_name()
         return full_name if full_name else self.username
+
+    # ---- Transaction PIN (hashed; never stored in plaintext) ----
+    def set_transaction_pin(self, raw_pin):
+        from django.contrib.auth.hashers import make_password
+        self.transaction_pin = make_password(str(raw_pin))
+
+    def check_transaction_pin(self, raw_pin):
+        from django.contrib.auth.hashers import check_password
+        if not self.transaction_pin:
+            return False
+        return check_password(str(raw_pin), self.transaction_pin)
+
+    @property
+    def has_transaction_pin(self):
+        return bool(self.transaction_pin)
 
 
 class EmailVerificationToken(models.Model):

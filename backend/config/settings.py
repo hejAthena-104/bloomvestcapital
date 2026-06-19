@@ -52,9 +52,9 @@ INSTALLED_APPS = [
     # Local apps
     'accounts',
     'dashboard',
-    'investments',
     'transactions',
     'support',
+    'services',
 ]
 
 MIDDLEWARE = [

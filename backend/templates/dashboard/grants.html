@@ -5,7 +5,7 @@
 
 <head>
     {% load static %}
-    
+
     <meta charset="utf-8">
     <meta name="csrf-token" content="TuDsCdKJ03MPusFP2GKqzoWGwF8PuVfDi0T5H9qW">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -142,7 +142,7 @@
     </script>
 
     <!-- Page Title -->
-    <title>Profit history | Bloomvest Capital</title>
+    <title>Grants | Bloomvest Capital</title>
         <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.1/dist/alpine.min.js" defer></script>
     <!-- Livewire Styles -->
 <style >
@@ -176,9 +176,9 @@
     {% include 'includes/messages.html' %}
 
 
-    
+
     <script>
-        
+
     </script>
     <!-- THEME CONFIGURATION -->
     <script>
@@ -320,7 +320,7 @@
                     <div>
     </div>
 
-<!-- Livewire Component wire-end:LYahCHJLLBrst2E7ZGVw -->                </a>
+<!-- Livewire Component wire-end:Z9Ir4uPXS0jx85STEPs2 -->                </a>
 
                 <!-- Notifications offcanvas -->
                 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNotifications"
@@ -388,7 +388,7 @@ window.smartsupp||(function(d) {
 {% endif %}
 </script>
 
-<!-- Livewire Component wire-end:j4RfaYnHJFnSm6204F3I -->                        </div>
+<!-- Livewire Component wire-end:Vki7xZf1FtI4h1OqmQVU -->                        </div>
                     </div>
                 </div>
                 <!-- Separator -->
@@ -447,143 +447,149 @@ window.smartsupp||(function(d) {
         </header>
 
         <div class="container-fluid mb-5">
-                <div>
-    <div>
-        <div>
-    <!-- Title -->
-    <h1 class="h2 m-0">
-        Account transactions history
-    </h1>
-    <p class="m-0">All your transaction history in one place.</p>
-</div>
+            <!-- Title -->
+            <h1 class="h2">
+                Grants
+            </h1>
+            <p class="text-muted">Apply for a grant as an individual or business &mdash; subject to review</p>
 
-<div class="row mt-5">
-    <div class="col-6 col-lg-3">
-        <!-- Card -->
-        <a href="{% url 'dashboard:accounthistory' %}">
-            <div class="card border-0">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div class="d-flex flex-column">
-                            <h3 class="card-title h4 mb-0">Deposits</h3>
-                                                    </div>
-
-                        <div class="avatar avatar-circle avatar-xs me-2">
-                            <i class="bi bi-wallet-fill fs-3"></i>
+            <div class="row mt-4">
+                <!-- Application form -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-header-title">New grant application</h4>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </a>
-    </div>
-    <div class="col-6 col-lg-3">
-        <!-- Card -->
-        <a href="{% url 'dashboard:withdrawal_history' %}">
-            <div class="card border-0">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div class="d-flex flex-column">
-                            <h3 class="card-title h4 mb-0">Withdrawals</h3>
-                                                    </div>
-
-                        <div class="avatar avatar-circle avatar-xs me-2">
-                            <i class="bi bi-graph-down fs-3"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </a>
-    </div>
-            <div class="col-6 col-lg-3">
-            <!-- Card -->
-            <a href="{% url 'dashboard:profit_history' %}">
-                <div class="card border-0 bg-primary text-white">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div class="d-flex flex-column">
-                                <h3 class="card-title h4 mb-0">Profit</h3>
-                                                                    <span class="fs-6 text-dark">0 records</span>
-                                                            </div>
-
-                            <div class="avatar avatar-circle avatar-xs me-2">
-                                <i class="bi bi-coin fs-3"></i>
+                        <div class="card-body">
+                            <div class="alert alert-info" role="alert">
+                                <i class="bi bi-info-circle"></i>
+                                Every application is subject to admin review.
                             </div>
+                            <form method="post" action="{% url 'dashboard:grants' %}">
+                                {% csrf_token %}
+
+                                <!-- Applicant type toggle -->
+                                <div class="mb-3">
+                                    <label class="form-label d-block">Applicant type</label>
+                                    <div class="btn-group" role="group" aria-label="Applicant type">
+                                        <input type="radio" class="btn-check" name="applicant_type" id="typeIndividual"
+                                            value="individual" autocomplete="off" checked
+                                            onchange="toggleApplicantType()">
+                                        <label class="btn btn-outline-primary" for="typeIndividual">
+                                            <i class="bi bi-person"></i> Individual
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="applicant_type" id="typeBusiness"
+                                            value="business" autocomplete="off"
+                                            onchange="toggleApplicantType()">
+                                        <label class="btn btn-outline-primary" for="typeBusiness">
+                                            <i class="bi bi-building"></i> Business
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Individual block -->
+                                <div id="individualBlock">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="full_name">Full name</label>
+                                        <input class="form-control" type="text" name="full_name" id="full_name"
+                                            placeholder="Enter your full name">
+                                    </div>
+                                </div>
+
+                                <!-- Business block -->
+                                <div id="businessBlock" style="display: none;">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="business_name">Business name</label>
+                                        <input class="form-control" type="text" name="business_name" id="business_name"
+                                            placeholder="Enter business name">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" for="registration_number">Registration number</label>
+                                        <input class="form-control" type="text" name="registration_number"
+                                            id="registration_number" placeholder="Enter registration number">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" for="business_type">Business type</label>
+                                        <input class="form-control" type="text" name="business_type" id="business_type"
+                                            placeholder="e.g. LLC, Sole Proprietor">
+                                    </div>
+                                </div>
+
+                                <!-- Common fields -->
+                                <div class="mb-3">
+                                    <label class="form-label" for="amount">Grant amount ($)</label>
+                                    <input class="form-control" type="number" step="any" min="1" name="amount"
+                                        id="amount" placeholder="Enter amount" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="purpose">Purpose</label>
+                                    <input class="form-control" type="text" name="purpose" id="purpose"
+                                        placeholder="What is this grant for?" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="details">Additional details</label>
+                                    <textarea class="form-control" name="details" id="details" rows="3"
+                                        placeholder="Tell us more about your request"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    Submit Application
+                                    <i class="bi bi-arrow-right"></i>
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
-            </a>
-        </div>
-        <div class="col-6 col-lg-3">
-        <!-- Card -->
-        <a href="{% url 'dashboard:other_history' %}">
-            <div class="card border-0">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div class="d-flex flex-column">
-                            <h3 class="card-title h4 mb-0">Others</h3>
-                                                    </div>
 
-                        <div class="avatar avatar-circle avatar-xs me-2">
-                            <i class="bi bi-hourglass fs-3"></i>
+                <!-- Applications table -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-header-title">Your grant applications</h4>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </a>
-    </div>
-
-</div>
-    </div>
-    <div>
-    </div>
-    <div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-body">
-                    <h5>Profit history</h5>
-                    <div class="table-responsive">
-                        <table class="table text-center">
-                            <thead>
-                                <tr>
-                                    <th>Plan</th>
-                                    <th>Amount</th>
-                                    <th>Type</th>
-                                    <th>Date created</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for profit in profits %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-nowrap card-table">
+                                <thead>
                                     <tr>
-                                        <td>{{ profit.investment.plan.name }}</td>
-                                        <td>${{ profit.amount }}</td>
-                                        <td>Daily Profit</td>
-                                        <td>{{ profit.date|date:"M d, Y" }}</td>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                        <th>Purpose</th>
+                                        <th>Status</th>
                                     </tr>
-                                {% empty %}
+                                </thead>
+                                <tbody>
+                                    {% for application in applications %}
                                     <tr>
-                                        <td class="py-5" colspan="4">
-                                            <i class="bi bi-database-fill-exclamation" style="font-size: 50px"></i>
-                                            <h5>No profit history</h5>
+                                        <td>{{ application.created_at|date:"M d, Y" }}</td>
+                                        <td>{{ application.get_applicant_type_display }}</td>
+                                        <td>${{ application.amount }}</td>
+                                        <td>{{ application.purpose }}</td>
+                                        <td>
+                                            {% if application.status == 'approved' %}
+                                            <span class="badge bg-success">{{ application.get_status_display }}</span>
+                                            {% elif application.status == 'rejected' %}
+                                            <span class="badge bg-danger">{{ application.get_status_display }}</span>
+                                            {% else %}
+                                            <span class="badge bg-warning">{{ application.get_status_display }}</span>
+                                            {% endif %}
                                         </td>
                                     </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div>
-                        <div>
-    </div>
-
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-5">
+                                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                            You have no grant applications yet.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
-<!-- Livewire Component wire-end:a2Qh8c8d99zioznwuiMj -->        </div>
 
         <!-- Footer -->
         <footer class="mt-auto">
@@ -667,6 +673,17 @@ window.smartsupp||(function(d) {
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"
         integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
+    <script>
+        // Toggle individual / business conditional blocks for grant applications
+        function toggleApplicantType() {
+            var isBusiness = document.getElementById('typeBusiness').checked;
+            document.getElementById('individualBlock').style.display = isBusiness ? 'none' : '';
+            document.getElementById('businessBlock').style.display = isBusiness ? '' : 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', toggleApplicantType);
+    </script>
     </body>
 
 </html>

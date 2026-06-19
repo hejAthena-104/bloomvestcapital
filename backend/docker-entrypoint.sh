@@ -7,6 +7,9 @@ set -e
 echo "[entrypoint] applying database migrations…"
 python manage.py migrate --no-input
 
+echo "[entrypoint] seeding baseline data (payment methods + swap rate)…"
+python manage.py seed_basics || true
+
 echo "[entrypoint] starting gunicorn on 0.0.0.0:${PORT:-8000}"
 exec gunicorn config.wsgi:application \
   --bind "0.0.0.0:${PORT:-8000}" \
