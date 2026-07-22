@@ -41,10 +41,23 @@ These rules now live in the `bloomvestcapital.com` block of
 `/opt/swifteagle/Caddyfile`. `netlify.toml` is kept as the historical record and
 the rollback path — it is no longer what serves the site.
 
-## Rollback
+## Rollback — ⚠️ Netlify is NOT currently a viable fallback
 
-Netlify is still published. Repoint DNS: apex A → `75.2.60.5`, `www` CNAME →
-`bloomvestcapital-1.netlify.app`.
+Checked at cutover (2026-07-22): all three Netlify origins return
+**HTTP 503 `{"error":"usage_exceeded"}`** — the Netlify account has exceeded its
+plan's usage limits, so the sites are hard-down there regardless of DNS. They
+were already failing for real users *before* this migration.
+
+Repointing DNS back to Netlify would therefore **restore an outage, not the
+site**. To make that a real rollback path again you must first resolve the
+Netlify account usage (wait for the monthly reset or upgrade the plan) and
+confirm `https://<site>.netlify.app/` returns 200.
+
+Practical rollback today = fix forward on the VPS (`git revert` + `git pull`),
+which is fast because the frontend is served straight off disk.
+
+If the Netlify account is healthy again, the DNS rollback is: apex A → `75.2.60.5`,
+`www` CNAME → `bloomvestcapital-1.netlify.app`.
 
 Full runbook, traps and the "add a new tenant" procedure:
 `/opt/swifteagle/README.static-sites.md` on the VPS.
